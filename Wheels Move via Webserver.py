@@ -30,6 +30,7 @@ while not wlan.isconnected():
     print("Connecting to WiFi...")
 print("IP Address:", wlan.ifconfig()[0])
 
+# Function to drive/steer robot
 def drive(direction):
   if direction == 'center':
     motor1_PWM.off()
@@ -105,10 +106,13 @@ while True:
     request = cl.recv(1024)
     request_str = str(request)
 
+    # give request to motors
+    drive(request)
+
     # Toggle LED based on the /toggle route
-    if 'forward' in request_str:
-        led.value(not led.value())
-        print("LED toggled")
+    #if 'forward' in request_str:
+    #    led.value(not led.value())
+    #    print("LED toggled")
 
     # Send the HTML page
     cl.send('HTTP/1.1 200 OK\r\n')
