@@ -13,7 +13,7 @@ motor1_b = Pin(3, Pin.OUT)
 motor1_PWM = Pin(0, Pin.OUT)
 motor2_a = Pin(4, Pin.OUT)
 motor2_b = Pin(5, Pin.OUT)
-Motor2_PWM = Pin(1, Pin.OUT)
+motor2_PWM = Pin(1, Pin.OUT)
 
 # WiFi credentials
 ssid = "CYBERTRON"
@@ -32,7 +32,7 @@ print("IP Address:", wlan.ifconfig()[0])
 
 # Function to drive/steer robot
 def drive(direction):
-  if direction == 'center':
+  if direction == 'stop':
     motor1_PWM.off()
     motor2_PWM.off()
   else:
@@ -48,6 +48,16 @@ def drive(direction):
     motor1_b.on()
     motor2_a.off()
     motor2_b.on()
+  elif direction == 'left':
+    motor1_a.on()
+    motor1_b.off()
+    motor2_a.on()
+    motor2_b.off()
+  elif direction == 'right':
+    motor1_a.on()
+    motor1_b.of()
+    motor2_a.on()
+    motor2_b.off()
 
 # HTML page for the web interface
 html = """
@@ -77,15 +87,37 @@ html = """
     </style>
 </head>
 <body>
-    <h1>Control LED on Raspberry Pi Pico W</h1>
-    <button class="button" onclick="moveForward()">Forward</button>
-    <button class="button" onClick="moveBackward()">Backward</button>
+    <h1>Motor Control</h1>
+    <table>
+    <tr>
+        <th></th>
+        <th><button class="button" onclick="moveForward()">Forward</button></th>
+    </tr>
+    <tr>
+        <th><button class="button" onClick="turnLeft()">Left</button></th>
+        <th><button class="button" onClick="stop()">Stop</button></th>
+        <th><button class="button" onClick="turnRight()">Right</button></th>
+   </tr>
+   <tr>
+        <th></th>
+        <th><button class="button" onClick="moveBackward()">Backward</button></th>
+   </tr>
+   </table>
     <script>
         function moveForward() {
             fetch('forward')
         }
         function moveBackward(){
             fetch('backward')
+        }
+        function turnLeft(){
+            fecth('left')
+        }
+        function turnRight(){
+            fecth('right')
+        }
+        function stop(){
+            fect('stop')
         }
     </script>
 </body>
@@ -95,7 +127,7 @@ html = """
 # Create a socket to listen for incoming requests
 addr = socket.getaddrinfo('0.0.0.0', 8080)[0][-1]
 s = socket.socket()
-s.bind(addr) 
+s.bind(addr)
 s.listen(1)
 print('Listening on', addr)
 
@@ -121,5 +153,3 @@ while True:
     cl.send(html)
 
     cl.close()
-
-
