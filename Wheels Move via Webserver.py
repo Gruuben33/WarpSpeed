@@ -32,32 +32,50 @@ print("IP Address:", wlan.ifconfig()[0])
 
 # Function to drive/steer robot
 def drive(direction):
-  if direction == 'stop':
-    motor1_PWM.off()
-    motor2_PWM.off()
-  else:
-    motor1_PWM.on()
-    motor2_PWM.on()
-  if direction == 'forward':
-    motor1_a.on()
-    motor1_b.off()
-    motor2_a.on()
-    motor2_b.off()
-  elif direction == 'backward':
-    motor1_a.off()
-    motor1_b.on()
-    motor2_a.off()
-    motor2_b.on()
-  elif direction == 'left':
-    motor1_a.on()
-    motor1_b.off()
-    motor2_a.on()
-    motor2_b.off()
-  elif direction == 'right':
-    motor1_a.on()
-    motor1_b.of()
-    motor2_a.on()
-    motor2_b.off()
+    if direction == 'stop':
+        motor1_PWM.off()
+        motor2_PWM.off()
+    else:
+        motor1_PWM.on()
+        motor2_PWM.on()
+
+    if direction == 'forward':
+        motor1_a.on()
+        motor1_b.off()
+        motor2_a.on()
+        motor2_b.off()
+        # Gradual speed increase for forward direction
+        for duty in range(0, 1024, 10):
+            motor1_PWM.duty(duty)
+            motor2_PWM.duty(duty)
+            time.sleep(0.05)
+        motor1_PWM.duty(1023)
+        motor2_PWM.duty(1023)
+
+    elif direction == 'backward':
+        motor1_a.off()
+        motor1_b.on()
+        motor2_a.off()
+        motor2_b.on()
+        # Gradual speed increase for backward direction
+        for duty in range(0, 1024, 10):
+            motor1_PWM.duty(duty)
+            motor2_PWM.duty(duty)
+            time.sleep(0.05)
+        motor1_PWM.duty(1023)
+        motor2_PWM.duty(1023)
+
+    elif direction == 'left':
+        motor1_a.on()
+        motor1_b.off()
+        motor2_a.on()
+        motor2_b.off()
+
+    elif direction == 'right':
+        motor1_a.on()
+        motor1_b.off()
+        motor2_a.on()
+        motor2_b.off()
 
 # HTML page for the web interface
 html = """
@@ -97,12 +115,12 @@ html = """
         <th><button class="button" onClick="turnLeft()">Left</button></th>
         <th><button class="button" onClick="stop()">Stop</button></th>
         <th><button class="button" onClick="turnRight()">Right</button></th>
-   </tr>
-   <tr>
+    </tr>
+    <tr>
         <th></th>
         <th><button class="button" onClick="moveBackward()">Backward</button></th>
-   </tr>
-   </table>
+    </tr>
+    </table>
     <script>
         function moveForward() {
             fetch('forward')
@@ -111,13 +129,13 @@ html = """
             fetch('backward')
         }
         function turnLeft(){
-            fecth('left')
+            fetch('left')
         }
         function turnRight(){
-            fecth('right')
+            fetch('right')
         }
         function stop(){
-            fect('stop')
+            fetch('stop')
         }
     </script>
 </body>
