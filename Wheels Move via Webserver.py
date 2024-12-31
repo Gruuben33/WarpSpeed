@@ -70,12 +70,16 @@ def drive(direction):
         motor1_b.off()
         motor2_a.on()
         motor2_b.off()
+        motor1_PWM.duty(700)
+        motor2_PWM.duty(1023)
 
     elif direction == 'right':
         motor1_a.on()
         motor1_b.off()
         motor2_a.on()
         motor2_b.off()
+        motor1_PWM.duty(1023)
+        motor2_PWM.duty(700)
 
 # HTML page for the web interface
 html = """
@@ -156,8 +160,17 @@ while True:
     request = cl.recv(1024)
     request_str = str(request)
 
-    # give request to motors
-    drive(request)
+    # Extract the direction from the URL, e.g., /forward, /backward, etc.
+    if '/forward' in request_str:
+        drive('forward')
+    elif '/backward' in request_str:
+        drive('backward')
+    elif '/left' in request_str:
+        drive('left')
+    elif '/right' in request_str:
+        drive('right')
+    elif '/stop' in request_str:
+        drive('stop')
 
     # Toggle LED based on the /toggle route
     #if 'forward' in request_str:
