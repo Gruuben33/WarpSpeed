@@ -5,7 +5,7 @@ from time import sleep
 from machine import Pin
 
 # Set up the onboard LED (GPIO 25)
-led = Pin(15, Pin.OUT)
+# led = Pin(15, Pin.OUT)
 
 # Motor pins
 motor1_a = Pin(2, Pin.OUT)
