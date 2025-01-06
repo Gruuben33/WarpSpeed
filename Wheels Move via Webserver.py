@@ -10,10 +10,13 @@ led = Pin(15, Pin.OUT)
 # Motor pins
 motor1_a = Pin(2, Pin.OUT)
 motor1_b = Pin(3, Pin.OUT)
-motor1_PWM = Pin(0, Pin.OUT)
+motor1_PWM = PWM(0, Pin.OUT)
 motor2_a = Pin(4, Pin.OUT)
 motor2_b = Pin(5, Pin.OUT)
-motor2_PWM = Pin(1, Pin.OUT)
+motor2_PWM = PWM(1, Pin.OUT)
+
+motor1_PWM.freq(1000)
+motor2_PWM.freq(1000)
 
 # WiFi credentials
 ssid = "CYBERTRON"
