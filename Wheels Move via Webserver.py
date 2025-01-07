@@ -45,14 +45,20 @@ def drive(direction):
         motor2_a.on()
         motor2_b.off()
         # Gradual speed increase for forward direction
-        motor1_PWM.duty_u16(512)
-        motor2_PWM.duty_u16(512)
+        if speed == 0:
+            speed = 512
+        motor1_PWM.duty_u16(speed)
+        motor2_PWM.duty_u16(speed)
         time.sleep(0.5)
-        motor1_PWM.duty_u16(767)
-        motor2_PWM.duty_u16(767)
+        if speed < 513:
+            speed = 767
+        motor1_PWM.duty_u16(speed)
+        motor2_PWM.duty_u16(speed)
         time.sleep(0.5)
-        motor1_PWM.duty_u16(1023)
-        motor2_PWM.duty_u16(1023)
+        if speed < 768:
+            speed = 1023
+        motor1_PWM.duty_u16(speed)
+        motor2_PWM.duty_u16(speed)
 
     elif direction == 'backward':
         motor1_a.off()
@@ -72,6 +78,7 @@ def drive(direction):
         motor2_b.off()
         motor1_PWM.duty_u16(700)
         motor2_PWM.duty_u16(1023)
+        speed = 0
 
     elif direction == 'right':
         motor1_a.on()
@@ -80,6 +87,7 @@ def drive(direction):
         motor2_b.off()
         motor1_PWM.duty_u16(1023)
         motor2_PWM.duty_u16(700)
+        speed = 0
 
 # HTML page for the web interface
 html = """
@@ -149,6 +157,7 @@ html = """
 # Create a socket to listen for incoming requests
 addr = socket.getaddrinfo('0.0.0.0', 8080)[0][-1]
 s = socket.socket()
+s.setsockopt(socket.SOL_SOCKET, socket.SOL_REUSEADDR, 1)
 s.bind(addr)
 s.listen(1)
 print('Listening on', addr)
