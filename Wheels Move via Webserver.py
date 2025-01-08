@@ -27,12 +27,13 @@ print("Connecting to WiFi...")
 while not wlan.isconnected():
     sleep(1)
     print("Connecting to WiFi...")
+print('Connected!')
 print("IP Address:", wlan.ifconfig()[0])
 
 # Function to drive/steer robot
 def drive(direction):
     if direction == 'stop':
-        motor1_PWM.duty_u16(0)  # Turn off PWM signal
+        motor1_PWM.duty_u16(0)
         motor2_PWM.duty_u16(0)
         motor1_a.off()
         motor1_b.off()
@@ -40,36 +41,20 @@ def drive(direction):
         motor2_b.off()
 
     elif direction == 'forward':
-        motor1_a.on()
-        motor1_b.off()
-        motor2_a.on()
-        motor2_b.off()
-        # Gradual speed increase for forward direction
-        if speed == 0:
-            speed = 512
-        motor1_PWM.duty_u16(speed)
-        motor2_PWM.duty_u16(speed)
-        time.sleep(0.5)
-        if speed < 513:
-            speed = 767
-        motor1_PWM.duty_u16(speed)
-        motor2_PWM.duty_u16(speed)
-        time.sleep(0.5)
-        if speed < 768:
-            speed = 1023
-        motor1_PWM.duty_u16(speed)
-        motor2_PWM.duty_u16(speed)
-
-    elif direction == 'backward':
         motor1_a.off()
         motor1_b.on()
         motor2_a.off()
         motor2_b.on()
-        motor1_PWM.duty_u16(512)
-        motor2_PWM.duty_u16(512)
-        time.sleep(0.5)
-        motor1_PWM.duty_u16(1023)
-        motor2_PWM.duty_u16(1023)
+        motor1_PWM.duty_u16(65536)
+        motor2_PWM.duty_u16(65536)
+
+    elif direction == 'backward':
+        motor1_a.on()
+        motor1_b.off()
+        motor2_a.on()
+        motor2_b.off()
+        motor1_PWM.duty_u16(252)
+        motor2_PWM.duty_u16(2352)
 
     elif direction == 'left':
         motor1_a.on()
@@ -78,7 +63,6 @@ def drive(direction):
         motor2_b.off()
         motor1_PWM.duty_u16(700)
         motor2_PWM.duty_u16(1023)
-        speed = 0
 
     elif direction == 'right':
         motor1_a.on()
@@ -86,8 +70,7 @@ def drive(direction):
         motor2_a.on()
         motor2_b.off()
         motor1_PWM.duty_u16(1023)
-        motor2_PWM.duty_u16(700)
-        speed = 0
+        motor2_PWM.duty_u16(7242)
 
 # HTML page for the web interface
 html = """
@@ -114,6 +97,20 @@ html = """
         .button:active {
             background-color: #45a049;
         }
+        .button.disabled {
+            background-color: #d3d3d3;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 18px;
+            color: green;
+        }
+        .error {
+            margin-top: 20px;
+            font-size: 18px;
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -121,49 +118,100 @@ html = """
     <table>
     <tr>
         <th></th>
-        <th><button class="button" onclick="moveForward()">Forward</button></th>
+        <th><button id="forwardButton" class="button" onclick="moveForward()">Forward</button></th>
     </tr>
     <tr>
-        <th><button class="button" onclick="turnLeft()">Left</button></th>
-        <th><button class="button" onclick="stop()">Stop</button></th>
-        <th><button class="button" onclick="turnRight()">Right</button></th>
+        <th><button id="leftButton" class="button" onclick="turnLeft()">Left</button></th>
+        <th><button id="stopButton" class="button" onclick="stop()">Stop</button></th>
+        <th><button id="rightButton" class="button" onclick="turnRight()">Right</button></th>
     </tr>
     <tr>
         <th></th>
-        <th><button class="button" onclick="moveBackward()">Backward</button></th>
+        <th><button id="backwardButton" class="button" onclick="moveBackward()">Backward</button></th>
     </tr>
     </table>
+    <div id="statusMessage" class="status"></div>
+    <div id="errorMessage" class="error"></div>
+
     <script>
+        async function updateStatus(message, isError = false) {
+            const statusMessage = document.getElementById('statusMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            if (isError) {
+                errorMessage.textContent = message;
+                statusMessage.textContent = '';
+            } else {
+                statusMessage.textContent = message;
+                errorMessage.textContent = '';
+            }
+        }
+
+        async function disableButtons() {
+            document.getElementById('forwardButton').classList.add('disabled');
+            document.getElementById('leftButton').classList.add('disabled');
+            document.getElementById('stopButton').classList.add('disabled');
+            document.getElementById('rightButton').classList.add('disabled');
+            document.getElementById('backwardButton').classList.add('disabled');
+        }
+
+        async function enableButtons() {
+            document.getElementById('forwardButton').classList.remove('disabled');
+            document.getElementById('leftButton').classList.remove('disabled');
+            document.getElementById('stopButton').classList.remove('disabled');
+            document.getElementById('rightButton').classList.remove('disabled');
+            document.getElementById('backwardButton').classList.remove('disabled');
+        }
+
+        async function fetchDirection(url) {
+            try {
+                disableButtons();
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                await updateStatus('Command executed successfully');
+            } catch (error) {
+                await updateStatus(`Error: ${error.message}`, true);
+            } finally {
+                enableButtons();
+            }
+        }
+
         function moveForward() {
-            fetch('/forward')
+            fetchDirection('/forward');
         }
-        function moveBackward(){
-            fetch('/backward')
+
+        function moveBackward() {
+            fetchDirection('/backward');
         }
-        function turnLeft(){
-            fetch('/left')
+
+        function turnLeft() {
+            fetchDirection('/left');
         }
-        function turnRight(){
-            fetch('/right')
+
+        function turnRight() {
+            fetchDirection('/right');
         }
-        function stop(){
-            fetch('/stop')
+
+        function stop() {
+            fetchDirection('/stop');
         }
     </script>
 </body>
 </html>
+
 """
 
 # Create a socket to listen for incoming requests
 addr = socket.getaddrinfo('0.0.0.0', 8080)[0][-1]
 s = socket.socket()
-s.setsockopt(socket.SOL_SOCKET, socket.SOL_REUSEADDR, 1)
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind(addr)
 s.listen(1)
 print('Listening on', addr)
 
 # Serve the web page and handle requests
-while True:
+while True: 
     cl, addr = s.accept()
     print('Client connected from', addr)
     request = cl.recv(1024)
@@ -189,4 +237,3 @@ while True:
     cl.send(html)
 
     cl.close()
-
