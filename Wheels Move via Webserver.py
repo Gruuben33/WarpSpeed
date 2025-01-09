@@ -14,41 +14,28 @@ motor2_PWM = PWM(Pin(1))  # Initialize PWM on pin 1 (GPIO 1)
 motor1_PWM.freq(1000)
 motor2_PWM.freq(1000)
 
+# Initialize prevDrive as a global variable
 prevDrive = 'stop'
 
-import network
-import time  # Import time module for sleep
-
-# WiFi credentials
 ssid = "CYBERTRON"
 password = "Mr.LamYo"
-static_ip = '192.168.99.141'  # Replace with the static IP you want
-subnet_mask = '255.255.255.0'  # Typically this is the subnet mask
-gateway_ip = '192.168.1.1'  # Replace with your gateway IP (router IP)
 
-# Initialize the Wi-Fi interface
+# Connect to WiFi
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-
-# Connect to Wi-Fi
 wlan.connect(ssid, password)
 print("Connecting to WiFi...")
 
 # Wait for the connection
 while not wlan.isconnected():
-    time.sleep(1)  # Use time.sleep() to wait
+    sleep(1)
     print("Connecting to WiFi...")
-
-# Set static IP configuration after successful connection
-wlan.ifconfig((static_ip, subnet_mask, gateway_ip, gateway_ip))
-
-# Output the connection status and IP address
-print('Connected!')
 print("IP Address:", wlan.ifconfig()[0])
-
 
 # Function to drive/steer robot
 def drive(direction):
+    global prevDrive  # Declare prevDrive as a global variable
+
     if direction == 'stop':
         motor1_PWM.duty_u16(0)
         motor2_PWM.duty_u16(0)
@@ -74,16 +61,17 @@ def drive(direction):
         motor2_b.off()
         motor1_PWM.duty_u16(65536)
         motor2_PWM.duty_u16(65536)
+        prevDrive = 'backward'
 
     elif direction == 'left':
-        if prevDrive is 'forward':
-            motor1_a.on()
-            motor1_b.off()
-            motor2_a.on()
-            motor2_b.off()
+        if prevDrive == 'forward':
+            motor1_a.off()
+            motor1_b.on()
+            motor2_a.off()
+            motor2_b.on()
             motor1_PWM.duty_u16(52429)
             motor2_PWM.duty_u16(65536)
-        elif prevDrive is 'stop':
+        elif prevDrive == 'stop':
             motor1_a.off()
             motor1_b.on()
             motor2_a.on()
@@ -92,14 +80,14 @@ def drive(direction):
             motor2_PWM.duty_u16(32768)
 
     elif direction == 'right':
-        if prevDrive is 'forward':
-            motor1_a.on()
-            motor1_b.off()
-            motor2_a.on()
-            motor2_b.off()
+        if prevDrive == 'forward':
+            motor1_a.off()
+            motor1_b.on()
+            motor2_a.off()
+            motor2_b.on()
             motor1_PWM.duty_u16(52429)
             motor2_PWM.duty_u16(65536)
-        elif prevDrive is 'stop':
+        elif prevDrive == 'stop':
             motor1_a.off()
             motor1_b.on()
             motor2_a.on()
@@ -272,3 +260,4 @@ while True:
     cl.send(html)
 
     cl.close()
+
