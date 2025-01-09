@@ -76,27 +76,36 @@ def drive(direction):
         motor2_PWM.duty_u16(65536)
 
     elif direction == 'left':
-        motor1_a.on()
-        motor1_b.off()
-        motor2_a.on()
-        motor2_b.off()
         if prevDrive is 'forward':
-            
-        elif prevDrive is 'stop':
             motor1_a.on()
             motor1_b.off()
             motor2_a.on()
             motor2_b.off()
-        motor1_PWM.duty_u16(65536)
-        motor2_PWM.duty_u16(65536)
+            motor1_PWM.duty_u16(52429)
+            motor2_PWM.duty_u16(65536)
+        elif prevDrive is 'stop':
+            motor1_a.off()
+            motor1_b.on()
+            motor2_a.on()
+            motor2_b.off()
+            motor1_PWM.duty_u16(32768)
+            motor2_PWM.duty_u16(32768)
 
     elif direction == 'right':
-        motor1_a.on()
-        motor1_b.off()
-        motor2_a.on()
-        motor2_b.off()
-        motor1_PWM.duty_u16(65536)
-        motor2_PWM.duty_u16(65536)
+        if prevDrive is 'forward':
+            motor1_a.on()
+            motor1_b.off()
+            motor2_a.on()
+            motor2_b.off()
+            motor1_PWM.duty_u16(52429)
+            motor2_PWM.duty_u16(65536)
+        elif prevDrive is 'stop':
+            motor1_a.off()
+            motor1_b.on()
+            motor2_a.on()
+            motor2_b.off()
+            motor1_PWM.duty_u16(32768)
+            motor2_PWM.duty_u16(32768)
 
 # HTML page for the web interface
 html = """
