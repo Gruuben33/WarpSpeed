@@ -222,7 +222,6 @@ html = """
     </script>
 </body>
 </html>
-
 """
 
 # Create a socket to listen for incoming requests
