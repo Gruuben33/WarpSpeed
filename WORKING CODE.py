@@ -13,14 +13,10 @@ motor2_b = Pin(5, Pin.OUT)
 motor2_PWM = PWM(Pin(1))  # Initialize PWM on pin 1 (GPIO 1)
 motor1_PWM.freq(1000)
 motor2_PWM.freq(1000)
+
+# onboard led test
 led = Pin("LED", Pin.OUT)
-
 led.on()
-
-
-# Initialize prevDrive as a global variable
-prevDrive = 'stop'
-speed = 0
 
 ssid = "CYBERTRON"
 password = "Mr.LamYo"
@@ -39,77 +35,46 @@ print("IP Address:", wlan.ifconfig()[0])
 
 # Function to drive/steer robot
 def drive(direction):
-    global prevDrive  # Declare prevDrive as a global variable
-    global speed
 
     if direction == 'stop':
-        speed = 0
-        motor1_PWM.duty_u16(speed)
-        motor2_PWM.duty_u16(speed)
+        motor1_PWM.duty_u16(0)
+        motor2_PWM.duty_u16(0)
         motor1_a.off()
         motor1_b.off()
         motor2_a.off()
         motor2_b.off()
-        prevDrive = 'stop'
 
     elif direction == 'forward':
         motor1_a.off()
         motor1_b.on()
         motor2_a.off()
         motor2_b.on()
-        speed = 65535
-        motor1_PWM.duty_u16(speed)
-        speed = 62258
-        motor2_PWM.duty_u16(speed)
-        prevDrive = 'forward'
+        motor1_PWM.duty_u16(65536)
+        motor2_PWM.duty_u16(63500)
 
     elif direction == 'backward':
         motor1_a.on()
         motor1_b.off()
         motor2_a.on()
         motor2_b.off()
-        speed = 65535
-        motor1_PWM.duty_u16(speed)
-        speed = 62258
-        motor2_PWM.duty_u16(speed)
-        prevDrive = 'backward'
+        motor1_PWM.duty_u16(65536)
+        motor2_PWM.duty_u16(63500)
 
     elif direction == 'right':
-#         if prevDrive == 'forward':
-#             motor1_a.off()
-#             motor1_b.on()
-#             motor2_a.off()
-#             motor2_b.on()
-#             speed -= 65535 * 0.1
-#             motor1_PWM.duty_u16(speed)
-#             speed = 65535
-#             motor2_PWM.duty_u16(speed)
-        if prevDrive == 'stop':
             motor1_a.off()
             motor1_b.on()
             motor2_a.on()
             motor2_b.off()
-            speed = 50000
-            motor1_PWM.duty_u16(speed)
-            motor2_PWM.duty_u16(speed)
+            motor1_PWM.duty_u16(50000)
+            motor2_PWM.duty_u16(50000)
 
     elif direction == 'left':
-#         if prevDrive == 'forward':
-#             motor1_a.off()
-#             motor1_b.on()
-#             motor2_a.off()
-#             motor2_b.on()
-#             speed = 65535
-#             motor1_PWM.duty_u16(speed)
-#             speed -= 65535 * 0.1
-#             motor2_PWM.duty_u16(speed)
-        if prevDrive == 'stop':
             motor1_a.on()
             motor1_b.off()
             motor2_a.off()
             motor2_b.on()
-            motor1_PWM.duty_u16(45000)
-            motor2_PWM.duty_u16(45000)
+            motor1_PWM.duty_u16(50000)
+            motor2_PWM.duty_u16(50000)
 
 # HTML page for the web interface
 html = """
