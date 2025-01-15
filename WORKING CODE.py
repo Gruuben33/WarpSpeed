@@ -14,6 +14,9 @@ motor2_PWM = PWM(Pin(1))  # Initialize PWM on pin 1 (GPIO 1)
 motor1_PWM.freq(1000)
 motor2_PWM.freq(1000)
 
+servo1 = PWM(Pin(15))
+servo1.freq(50)
+
 # onboard led test
 led = Pin("LED", Pin.OUT)
 led.on()
@@ -115,9 +118,41 @@ html = """
             font-size: 18px;
             color: red;
         }
+        /* Style for the vertical slider */
+        #verticalSlider {
+            position: absolute;
+            top: 50px;
+            left: 500px;
+            width: 30px;
+            height: 200px;
+        }
+
+        #verticalSlider input {
+            width: 100%;
+            height: 100%;
+            transform: rotate(0deg);  /* Rotate slider 90 degrees */
+            -webkit-appearance: slider-vertical;
+            appearance: slider-vertical; /* For cross-browser support */
+            background: #ddd;
+        }
+
+        #sliderValue {
+            position: absolute;
+            top: 380px;
+            left: 950px;
+            font-size: 16px;
+            color: #007bff;
+        }
     </style>
 </head>
 <body>
+<!-- Vertical Slider -->
+    <div id="verticalSlider">
+        <input type="range" id="slider" min="1802" max="7664" value="1802" />
+    </div>
+
+    <p id="status">Status: Waiting...</p>
+    <p id="sliderValue">Slider Value: 1802</p>
     <h1>Motor Control</h1>
     <table>
     <tr>
@@ -200,6 +235,13 @@ html = """
         function stop() {
             fetchDirection('/stop');
         }
+
+        // Event listener for slider value change
+        document.getElementById('slider').addEventListener('input', function() {
+            var sliderValue = this.value;
+            document.getElementById('sliderValue').textContent = 'Slider Value: ' + sliderValue;
+            fetch(`/set_slider?value=${sliderValue}`);
+        });
     </script>
 </body>
 </html>
@@ -213,8 +255,20 @@ s.bind(addr)
 s.listen(1)
 print('Listening on', addr)
 
+# Continue from the previous code
+
+# Function to handle the slider value
+def handle_slider_value(value):
+    print(f"Slider value received: {value}")
+    # Implement any behavior you want here, e.g., set motor speed or adjust PWM
+    servo1.duty_u16(value)
+    
+    # Example: Use the slider value to control motor PWM
+#     motor1_PWM.duty_u16(int(value))
+#     motor2_PWM.duty_u16(int(value))
+
 # Serve the web page and handle requests
-while True: 
+while True:
     cl, addr = s.accept()
     print('Client connected from', addr)
     request = cl.recv(1024)
@@ -233,6 +287,14 @@ while True:
     elif '/stop' in request_str:
         drive('stop')
 
+    # Check if there's a slider value being set
+    if '/set_slider' in request_str:
+        # Extract the value from the URL query string, e.g., /set_slider?value=4000
+        value_index = request_str.find("value=")
+        if value_index != -1:
+            value = int(request_str[value_index + 6:value_index + 10])  # Extract the value (4-digit number)
+            handle_slider_value(value)
+
     # Send the HTML page
     cl.send('HTTP/1.1 200 OK\r\n')
     cl.send('Content-Type: text/html\r\n')
@@ -240,3 +302,4 @@ while True:
     cl.send(html)
 
     cl.close()
+
