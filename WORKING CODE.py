@@ -14,7 +14,9 @@ motor2_PWM = PWM(Pin(1))  # Initialize PWM on pin 1 (GPIO 1)
 motor1_PWM.freq(1000)
 motor2_PWM.freq(1000)
 
+# Initialize PWM and servo pins
 servo1 = PWM(Pin(15))
+servo2 = PWM(Pin(14))
 servo1.freq(50)
 
 # onboard led test
@@ -64,20 +66,27 @@ def drive(direction):
         motor2_PWM.duty_u16(63500)
 
     elif direction == 'right':
-            motor1_a.off()
-            motor1_b.on()
-            motor2_a.on()
-            motor2_b.off()
-            motor1_PWM.duty_u16(50000)
-            motor2_PWM.duty_u16(50000)
+        motor1_a.off()
+        motor1_b.on()
+        motor2_a.on()
+        motor2_b.off()
+        motor1_PWM.duty_u16(50000)
+        motor2_PWM.duty_u16(50000)
 
     elif direction == 'left':
-            motor1_a.on()
-            motor1_b.off()
-            motor2_a.off()
-            motor2_b.on()
-            motor1_PWM.duty_u16(50000)
-            motor2_PWM.duty_u16(50000)
+        motor1_a.on()
+        motor1_b.off()
+        motor2_a.off()
+        motor2_b.on()
+        motor1_PWM.duty_u16(50000)
+        motor2_PWM.duty_u16(50000)
+        
+    elif direction == 'stab':
+        print('it got this far')
+        servo1.duty_u16(7664)
+        sleep(1)
+        servo1.duty_u16(1802)
+        sleep(1)
 
 # HTML page for the web interface
 html = """
@@ -118,10 +127,11 @@ html = """
             font-size: 18px;
             color: red;
         }
+      
         /* Style for the vertical slider */
         #verticalSlider {
             position: absolute;
-            top: 50px;
+            top: 200px;
             left: 500px;
             width: 30px;
             height: 200px;
@@ -129,8 +139,7 @@ html = """
 
         #verticalSlider input {
             width: 100%;
-            height: 100%;
-            transform: rotate(0deg);  /* Rotate slider 90 degrees */
+            height: 80%;
             -webkit-appearance: slider-vertical;
             appearance: slider-vertical; /* For cross-browser support */
             background: #ddd;
@@ -138,17 +147,24 @@ html = """
 
         #sliderValue {
             position: absolute;
-            top: 380px;
-            left: 950px;
+            top: 150px;
+            left: 350px;
             font-size: 16px;
             color: #007bff;
+        }
+
+        /* Positioning for stab button */
+        .stabButton {
+            position: absolute;
+            top: 200px;
+            left: 540px;
         }
     </style>
 </head>
 <body>
-<!-- Vertical Slider -->
+    <!-- Vertical Slider -->
     <div id="verticalSlider">
-        <input type="range" id="slider" min="1802" max="7664" value="1802" />
+        <input type="range" id="slider" min="5000" max="6400" value="1802" />
     </div>
 
     <p id="status">Status: Waiting...</p>
@@ -169,6 +185,9 @@ html = """
         <th><button id="backwardButton" class="button" onclick="moveBackward()">Backward</button></th>
     </tr>
     </table>
+    <!-- Stab Button placed on the right of the slider -->
+    <button id="stabButton" class="button stabButton" onclick="stab()">Stab</button>
+    
     <div id="statusMessage" class="status"></div>
     <div id="errorMessage" class="error"></div>
 
@@ -191,6 +210,7 @@ html = """
             document.getElementById('stopButton').classList.add('disabled');
             document.getElementById('rightButton').classList.add('disabled');
             document.getElementById('backwardButton').classList.add('disabled');
+            document.getElementById('stabButton').classList.add('disabled'); // Disable stab button too
         }
 
         async function enableButtons() {
@@ -199,6 +219,7 @@ html = """
             document.getElementById('stopButton').classList.remove('disabled');
             document.getElementById('rightButton').classList.remove('disabled');
             document.getElementById('backwardButton').classList.remove('disabled');
+            document.getElementById('stabButton').classList.remove('disabled'); // Enable stab button
         }
 
         async function fetchDirection(url) {
@@ -236,6 +257,10 @@ html = """
             fetchDirection('/stop');
         }
 
+        function stab() {
+            fetchDirection('/stab');  // Same as movement functions
+        }
+
         // Event listener for slider value change
         document.getElementById('slider').addEventListener('input', function() {
             var sliderValue = this.value;
@@ -261,7 +286,8 @@ print('Listening on', addr)
 def handle_slider_value(value):
     print(f"Slider value received: {value}")
     # Implement any behavior you want here, e.g., set motor speed or adjust PWM
-    servo1.duty_u16(value)
+    servo2.duty_u16(value)
+    sleep(1)
     
     # Example: Use the slider value to control motor PWM
 #     motor1_PWM.duty_u16(int(value))
@@ -276,6 +302,7 @@ while True:
     print(request_str)
 
     # Extract the direction from the URL, e.g., /forward, /backward, etc.
+    print('it first got here')
     if '/forward' in request_str:
         drive('forward')
     elif '/backward' in request_str:
@@ -286,6 +313,8 @@ while True:
         drive('right')
     elif '/stop' in request_str:
         drive('stop')
+    elif '/stab' in request_str:
+        drive('stab')
 
     # Check if there's a slider value being set
     if '/set_slider' in request_str:
@@ -302,4 +331,3 @@ while True:
     cl.send(html)
 
     cl.close()
-
