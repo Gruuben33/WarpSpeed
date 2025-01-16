@@ -140,6 +140,7 @@ html = """
         #verticalSlider input {
             width: 100%;
             height: 80%;
+            transform: rotate(180deg);
             -webkit-appearance: slider-vertical;
             appearance: slider-vertical; /* For cross-browser support */
             background: #ddd;
