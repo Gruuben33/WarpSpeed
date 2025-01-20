@@ -22,6 +22,7 @@ servo1.freq(50)
 # onboard led test
 led = Pin("LED", Pin.OUT)
 led.on()
+GOOD_BOY_LED = Pin(17, Pin.OUT)
 
 ssid = "CYBERTRON"
 password = "Mr.LamYo"
@@ -34,6 +35,7 @@ print("Connecting to WiFi...")
 
 # Wait for the connection
 while not wlan.isconnected():
+    GOOD_BOY_LED.on()
     sleep(1)
     print("Connecting to WiFi...")
 print("IP Address:", wlan.ifconfig()[0])
@@ -296,6 +298,7 @@ def handle_slider_value(value):
 
 # Serve the web page and handle requests
 while True:
+    GOOD_BOY_LED.on()
     cl, addr = s.accept()
     print('Client connected from', addr)
     request = cl.recv(1024)
