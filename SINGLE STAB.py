@@ -305,9 +305,15 @@ while True:
     request_str = str(request)
     print(request_str)
 
+    if 'GET / ' in request_str:  # Only handle the first request to load the page
+        # Send the HTML page
+        cl.send('HTTP/1.1 200 OK\r\n')
+        cl.send('Content-Type: text/html\r\n')
+        cl.send('Connection: close\r\n\r\n')
+        cl.send(html)
+    
     # Extract the direction from the URL, e.g., /forward, /backward, etc.
-    print('it first got here')
-    if '/forward' in request_str:
+    elif '/forward' in request_str:
         drive('forward')
     elif '/backward' in request_str:
         drive('backward')
@@ -327,11 +333,5 @@ while True:
         if value_index != -1:
             value = int(request_str[value_index + 6:value_index + 10])  # Extract the value (4-digit number)
             handle_slider_value(value)
-
-    # Send the HTML page
-    cl.send('HTTP/1.1 200 OK\r\n')
-    cl.send('Content-Type: text/html\r\n')
-    cl.send('Connection: close\r\n\r\n')
-    cl.send(html)
 
     cl.close()
