@@ -35,10 +35,11 @@ print("Connecting to WiFi...")
 
 # Wait for the connection
 while not wlan.isconnected():
-    GOOD_BOY_LED.on()
+    GOOD_BOY_LED.off()
     sleep(1)
     print("Connecting to WiFi...")
 print("IP Address:", wlan.ifconfig()[0])
+GOOD_BOY_LED.on()
 
 # Function to drive/steer robot
 def drive(direction):
@@ -298,7 +299,6 @@ def handle_slider_value(value):
 
 # Serve the web page and handle requests
 while True:
-    GOOD_BOY_LED.on()
     cl, addr = s.accept()
     print('Client connected from', addr)
     request = cl.recv(1024)
