@@ -217,15 +217,23 @@ s.listen(1)
 print('Listening on', addr)
 
 # Serve the web page and handle requests
-while True: 
+while True:
     cl, addr = s.accept()
     print('Client connected from', addr)
     request = cl.recv(1024)
     request_str = str(request)
     print(request_str)
 
-    # Extract the direction from the URL, e.g., /forward, /backward, etc.
-    if '/forward' in request_str:
+    # Send the HTML page only on the initial request (i.e., when the URL is '/')
+    if 'GET / ' in request_str:  # Only handle the first request to load the page
+        # Send the HTML page
+        cl.send('HTTP/1.1 200 OK\r\n')
+        cl.send('Content-Type: text/html\r\n')
+        cl.send('Connection: close\r\n\r\n')
+        cl.send(html)
+
+    # Handle other actions like '/forward', '/backward', etc.
+    elif '/forward' in request_str:
         drive('forward')
     elif '/backward' in request_str:
         drive('backward')
@@ -235,11 +243,5 @@ while True:
         drive('right')
     elif '/stop' in request_str:
         drive('stop')
-
-    # Send the HTML page
-    cl.send('HTTP/1.1 200 OK\r\n')
-    cl.send('Content-Type: text/html\r\n')
-    cl.send('Connection: close\r\n\r\n')
-    cl.send(html)
 
     cl.close()
