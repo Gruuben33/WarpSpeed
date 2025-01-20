@@ -53,7 +53,7 @@ def drive(direction):
         motor2_a.off()
         motor2_b.on()
         motor1_PWM.duty_u16(65536)
-        motor2_PWM.duty_u16(63500)
+        motor2_PWM.duty_u16(63000)
 
     elif direction == 'backward':
         motor1_a.on()
@@ -61,7 +61,7 @@ def drive(direction):
         motor2_a.on()
         motor2_b.off()
         motor1_PWM.duty_u16(65536)
-        motor2_PWM.duty_u16(63500)
+        motor2_PWM.duty_u16(63000)
 
     elif direction == 'right':
             motor1_a.off()
