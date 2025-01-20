@@ -17,6 +17,7 @@ motor2_PWM.freq(1000)
 # onboard led test
 led = Pin("LED", Pin.OUT)
 led.on()
+GOOD_BOY_LED = Pin(17, Pin.OUT)
 
 ssid = "CYBERTRON"
 password = "Mr.LamYo"
@@ -29,9 +30,11 @@ print("Connecting to WiFi...")
 
 # Wait for the connection
 while not wlan.isconnected():
+    GOOD_BOY_LED.off()
     sleep(1)
     print("Connecting to WiFi...")
 print("IP Address:", wlan.ifconfig()[0])
+GOOD_BOY_LED.on()
 
 # Function to drive/steer robot
 def drive(direction):
