@@ -87,9 +87,9 @@ def drive(direction):
     elif direction == 'stab':
         print('it got this far')
         servo1.duty_u16(7664)
-        sleep(1)
+        sleep(2)
         servo1.duty_u16(1802)
-        sleep(1)
+        sleep(2)
 
 # HTML page for the web interface
 html = """
