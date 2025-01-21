@@ -58,7 +58,7 @@ def drive(direction):
         motor2_a.off()
         motor2_b.on()
         motor1_PWM.duty_u16(65536)
-        motor2_PWM.duty_u16(63500)
+        motor2_PWM.duty_u16(65536)
         prevDrive = 'forward'  # Update prevDrive when moving forward
 
     elif direction == 'backward':
@@ -71,9 +71,9 @@ def drive(direction):
 
     elif direction == 'right':
         if prevDrive == 'stop':
-            motor1_a.off()
-            motor1_b.on()
-            motor2_a.on()
+            motor1_a.on()
+            motor1_b.off()
+            motor2_a.off()
             motor2_b.off()
             motor1_PWM.duty_u16(50000)
             motor2_PWM.duty_u16(50000)
@@ -87,10 +87,10 @@ def drive(direction):
 
     elif direction == 'left':
         if prevDrive == 'stop':
-            motor1_a.on()
+            motor1_a.off()
             motor1_b.off()
-            motor2_a.off()
-            motor2_b.on()
+            motor2_a.on()
+            motor2_b.off()
             motor1_PWM.duty_u16(50000)
             motor2_PWM.duty_u16(50000)
         elif prevDrive == 'forward':
