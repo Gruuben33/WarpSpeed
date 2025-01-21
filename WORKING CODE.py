@@ -14,6 +14,9 @@ motor2_PWM = PWM(Pin(1))  # Initialize PWM on pin 1 (GPIO 1)
 motor1_PWM.freq(1000)
 motor2_PWM.freq(1000)
 
+prevDrive = 'stop'
+
+
 # onboard led test
 led = Pin("LED", Pin.OUT)
 led.on()
@@ -38,6 +41,7 @@ GOOD_BOY_LED.on()
 
 # Function to drive/steer robot
 def drive(direction):
+    global prevDrive  # Declare prevDrive as global
 
     if direction == 'stop':
         motor1_PWM.duty_u16(0)
@@ -46,6 +50,7 @@ def drive(direction):
         motor1_b.off()
         motor2_a.off()
         motor2_b.off()
+        prevDrive = 'stop'  # Update prevDrive when stopping
 
     elif direction == 'forward':
         motor1_a.off()
@@ -53,7 +58,8 @@ def drive(direction):
         motor2_a.off()
         motor2_b.on()
         motor1_PWM.duty_u16(65536)
-        motor2_PWM.duty_u16(63000)
+        motor2_PWM.duty_u16(63500)
+        prevDrive = 'forward'  # Update prevDrive when moving forward
 
     elif direction == 'backward':
         motor1_a.on()
@@ -61,23 +67,40 @@ def drive(direction):
         motor2_a.on()
         motor2_b.off()
         motor1_PWM.duty_u16(65536)
-        motor2_PWM.duty_u16(63000)
+        motor2_PWM.duty_u16(63500)
 
     elif direction == 'right':
+        if prevDrive == 'stop':
             motor1_a.off()
             motor1_b.on()
             motor2_a.on()
             motor2_b.off()
             motor1_PWM.duty_u16(50000)
             motor2_PWM.duty_u16(50000)
+        elif prevDrive == 'forward':
+            motor1_a.off()
+            motor1_b.on()
+            motor2_a.off()
+            motor2_b.on()
+            motor1_PWM.duty_u16(65536)
+            motor2_PWM.duty_u16(33000)
 
     elif direction == 'left':
+        if prevDrive == 'stop':
             motor1_a.on()
             motor1_b.off()
             motor2_a.off()
             motor2_b.on()
             motor1_PWM.duty_u16(50000)
             motor2_PWM.duty_u16(50000)
+        elif prevDrive == 'forward':
+            motor1_a.off()
+            motor1_b.on()
+            motor2_a.off()
+            motor2_b.on()
+            motor1_PWM.duty_u16(35536)
+            motor2_PWM.duty_u16(63000)
+
 
 # HTML page for the web interface
 html = """
