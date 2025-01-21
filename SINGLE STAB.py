@@ -18,6 +18,7 @@ motor2_PWM.freq(1000)
 servo1 = PWM(Pin(15))
 servo2 = PWM(Pin(14))
 servo1.freq(50)
+servo2.freq(50)
 
 # onboard led test
 led = Pin("LED", Pin.OUT)
