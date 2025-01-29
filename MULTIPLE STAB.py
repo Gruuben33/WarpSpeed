@@ -24,8 +24,8 @@ servo2.freq(50)
 led = Pin("LED", Pin.OUT)
 led.on()
 
-ssid = "CYBERTRON"
-password = "Mr.LamYo"
+ssid = "Your Wi-Fi"
+password = "Your Password"
 
 # Connect to WiFi
 wlan = network.WLAN(network.STA_IF)
