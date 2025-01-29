@@ -25,8 +25,8 @@ led = Pin("LED", Pin.OUT)
 led.on()
 GOOD_BOY_LED = Pin(17, Pin.OUT)
 
-ssid = "CYBERTRON"
-password = "Mr.LamYo"
+ssid = "Your Wi-Fi"
+password = "Your Password"
 
 # Connect to WiFi
 wlan = network.WLAN(network.STA_IF)
