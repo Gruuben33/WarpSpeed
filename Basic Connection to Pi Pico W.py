@@ -13,8 +13,8 @@ led = Pin(15, Pin.OUT)
 # motor2_a
 
 # WiFi credentials
-ssid = "CYBERTRON"
-password = "Mr.LamYo"
+ssid = "Your Wi-Fi"
+password = "Your Password"
 
 # Connect to WiFi
 wlan = network.WLAN(network.STA_IF)
